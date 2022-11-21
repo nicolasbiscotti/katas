@@ -1,41 +1,40 @@
-const createReversi = require("./reversi");
+const { legalMovesForPlayerInTurn } = require("./reversi");
 
 describe("Reversi Test", () => {
-  describe("Create Reversi", () => {
-    it("should try to track each sqaure", () => {
-      let count = 0;
-      const squares = [1, 2, 3, 4];
-      function trackSquare(square) {
-        if (square < 5) {
-          count++;
-        }
-      }
-      function createOutput() {}
-      const reversi = createReversi(squares, trackSquare, createOutput);
-      reversi("..\n..");
-      expect(count).toEqual(4);
+  describe("Legal Moves for Player in Turn", () => {
+    it("should return [] for player W turn", () => {
+      const square = {
+        isLegalMoveFor: (player) => player === "B",
+        getCoordinates: () => ({ row: 0, col: 0 }),
+      };
+      expect(legalMovesForPlayerInTurn("W", [square])).toEqual([]);
     });
-    it("should return the output board with valid moves", () => {
-      const squares = [];
-      function trackSquare() {}
-      function createOutput(input) {
-        if (input === ".WB\n...\n...") {
-          return "OWB\n...\n...";
-        }
-      }
-      const reversi = createReversi(squares, trackSquare, createOutput);
-      expect(reversi(".WB\n...\n...")).toEqual("OWB\n...\n...");
+
+    it("should return [{row:2, col:3}] for player W turn", () => {
+      const square = {
+        isLegalMoveFor: (player) => player === "W",
+        getCoordinates: () => ({ row: 2, col: 3 }),
+      };
+      expect(legalMovesForPlayerInTurn("W", [square])).toEqual([
+        { row: 2, col: 3 },
+      ]);
+    });
+    it("should return [{row:1, col:2}] for player B turn", () => {
+      const squareOne = {
+        isLegalMoveFor: (player) => player === "W",
+        getCoordinates: () => ({ row: 1, col: 1 }),
+      };
+      const squareTwo = {
+        isLegalMoveFor: (player) => player === "B",
+        getCoordinates: () => ({ row: 1, col: 2 }),
+      };
+      expect(legalMovesForPlayerInTurn("B", [squareOne, squareTwo])).toEqual([
+        { row: 1, col: 2 },
+      ]);
     });
   });
 
-  describe("Create Square", () => {
-    it("should create a square", () => {
-      const square = createSquare(
-        { value: ".", cordinates: { row: 0, col: 0 },  },
-        [() => ["."], () => []]
-      );
-      square.isValidMoveFor("B");
-      expect(square).toEqual({});
-    });
-  });
+  // describe("Mark Legal Moves", () => {
+  //   it("should ")
+  // })
 });
