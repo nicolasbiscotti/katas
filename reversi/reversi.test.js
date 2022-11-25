@@ -1,90 +1,52 @@
-const { legalMovesForPlayerInTurn, createSquare } = require("./reversi");
+const createReversi = require("./reversi");
 
 describe("Reversi Test", () => {
-  // getBoardPosition()
-  // getPlayerInTurn()
-  // getSquares()
-
-  describe("Create Square", () => {
-    it("should return {row:2, col:3}", () => {
-      const square = createSquare({ coordinates: { row: 2, col: 3 } });
-      expect(square.getCoordinates()).toEqual({ row: 2, col: 3 });
-    });
-    it("should return false when the square is busy", () => {
-      const square = createSquare({
-        coordinates: { row: 4, col: 2 },
-        busyBy: "B",
-        findFlippingLine: () => {},
-      });
-      expect(square.isLegalMoveFor("W")).toEqual(false);
-    });
-    it("should return true when square is empty and flipping line is found", () => {
-      function findFlippingLine(coordinates, forPlayer) {
-        if (!!coordinates && forPlayer === "W") {
-          return true;
-        }
-      }
-
-      const square = createSquare({
-        coordinates: { row: 0, col: 0 },
-        busyBy: null,
-        findFlippingLine,
-      });
-
-      expect(square.isLegalMoveFor("W")).toEqual(true);
-    });
-    it("should return false when square is empty but no flipping line is found", () => {
-      function findFlippingLine(coordinates, forPlayer) {
-        if (!!coordinates && forPlayer === "B") {
-          return false;
-        }
-        return true;
-      }
-
-      const square = createSquare({
-        coordinates: { row: 3, col: 5 },
-        busyBy: null,
-        findFlippingLine,
-      });
-
-      expect(square.isLegalMoveFor("B")).toEqual(false);
-    });
+  it("should return one legal move for B", () => {
+    const input = ".WB.\n....\n....\n....\nB";
+    const output = "0WB.\n....\n....\n....\nB";
+    const reversi = createReversi();
+    expect(reversi(input)).toEqual(output);
   });
-
-  describe("Legal Moves for Player in Turn", () => {
-    it("should return [] for player W turn", () => {
-      const square = {
-        isLegalMoveFor: (player) => player === "B",
-        getCoordinates: () => ({ row: 0, col: 0 }),
-      };
-      expect(legalMovesForPlayerInTurn("W", [square])).toEqual([]);
-    });
-
-    it("should return [{row:2, col:3}] for player W turn", () => {
-      const square = {
-        isLegalMoveFor: (player) => player === "W",
-        getCoordinates: () => ({ row: 2, col: 3 }),
-      };
-      expect(legalMovesForPlayerInTurn("W", [square])).toEqual([
-        { row: 2, col: 3 },
-      ]);
-    });
-    it("should return [{row:1, col:2}] for player B turn", () => {
-      const squareOne = {
-        isLegalMoveFor: (player) => player === "W",
-        getCoordinates: () => ({ row: 1, col: 1 }),
-      };
-      const squareTwo = {
-        isLegalMoveFor: (player) => player === "B",
-        getCoordinates: () => ({ row: 1, col: 2 }),
-      };
-      expect(legalMovesForPlayerInTurn("B", [squareOne, squareTwo])).toEqual([
-        { row: 1, col: 2 },
-      ]);
-    });
+  it("should return the same board position", () => {
+    const input = "..B.\n....\n....\n....\nB";
+    const output = "..B.\n....\n....\n....\nB";
+    const reversi = createReversi();
+    expect(reversi(input)).toEqual(output);
   });
-
-  // describe("Mark Legal Moves", () => {
-  //   it("should ")
-  // })
+  it("should return one legal move for B", () => {
+    const input = "..WB\n....\n....\n....\nB";
+    const output = ".0WB\n....\n....\n....\nB";
+    const reversi = createReversi();
+    expect(reversi(input)).toEqual(output);
+  });
+  it("should return one legal move for B", () => {
+    const input = ".BW.\n....\n....\n....\nB";
+    const output = ".BW0\n....\n....\n....\nB";
+    const reversi = createReversi();
+    expect(reversi(input)).toEqual(output);
+  });
+  it("should return one legal move for B", () => {
+    const input = "....\n.WB.\n....\n....\nB";
+    const output = "....\n0WB.\n....\n....\nB";
+    const reversi = createReversi();
+    expect(reversi(input)).toEqual(output);
+  });
+  it("should return the same board position", () => {
+    const input = ".W..\n....\n....\n....\nW";
+    const output = ".W..\n....\n....\n....\nW";
+    const reversi = createReversi();
+    expect(reversi(input)).toEqual(output);
+  });
+  it("should return the same board position", () => {
+    const input = ".....\n.....\n.....\n.W.B.\n.....\nW";
+    const output = ".....\n.....\n.....\n.W.B.\n.....\nW";
+    const reversi = createReversi();
+    expect(reversi(input)).toEqual(output);
+  });
+  it("should return one legal move for B", () => {
+    const input = "...\n.W.\n.B.\nB";
+    const output = ".0.\n.W.\n.B.\nB";
+    const reversi = createReversi();
+    expect(reversi(input)).toEqual(output);
+  });
 });

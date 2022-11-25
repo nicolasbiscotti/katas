@@ -1,33 +1,117 @@
-function createReversi() {}
+let boardRows = [];
 
-function legalMovesForPlayerInTurn(player, squares) {
-  const legalMoves = [];
-  for (const square of squares) {
-    if (square.isLegalMoveFor(player)) {
-      legalMoves.push(square.getCoordinates());
-    }
-  }
-  return legalMoves;
-}
+function createReversi() {
+  return function (input) {
+    let output = "";
 
-function createSquare({ coordinates, busyBy, findFlippingLine }) {
-  function getCoordinates() {
-    return { ...coordinates };
-  }
-  function isLegalMoveFor(player) {
-    const isEmpty = busyBy === null;
-    const flipsAnyOpponentsCounter = findFlippingLine(coordinates, player);
-    const isLegalMove = isEmpty && flipsAnyOpponentsCounter;
-    if (isLegalMove) {
-      return true;
-    } else {
-      return false;
+    const [player, lines] = getGameState(input);
+    boardRows = lines;
+
+    for (const line of lines) {
+      output += getOutputLine(player, line);
     }
-  }
-  return {
-    getCoordinates,
-    isLegalMoveFor,
+
+    output += player;
+
+    return output;
   };
 }
 
-module.exports = { createReversi, legalMovesForPlayerInTurn, createSquare };
+function canAnyCounterBeFlipped(spot, spotValue, player) {
+  let theAnswerIs;
+
+  if (spot === 1 && (spotValue === "." || spotValue === player)) {
+    theAnswerIs = false;
+  } else if (spotValue === ".") {
+    theAnswerIs = false;
+  } else if (spotValue === player) {
+    theAnswerIs = true;
+  } else {
+    theAnswerIs = null;
+  }
+
+  return theAnswerIs;
+}
+
+function checkPosition(player, adjacentLine) {
+  for (let spot = 0; spot < adjacentLine.length; spot++) {
+    const spotValue = adjacentLine[spot];
+    const answer = canAnyCounterBeFlipped(spot + 1, spotValue, player);
+    if (answer !== null) {
+      return answer;
+    }
+  }
+  return false;
+}
+
+function getRigth(line, emptyPosition) {
+  const adjacentLine = line.slice(emptyPosition + 1);
+  return adjacentLine;
+}
+
+function getLeft(line, emptyPosition) {
+  const values = line.split("");
+  const adjacentLine = [];
+  for (let index = emptyPosition - 1; index >= 0; index--) {
+    const value = values[index];
+    adjacentLine.push(value);
+  }
+  return adjacentLine.join("");
+}
+
+function getDown(line, emptyPosition) {
+  function getRowAndCol(position, boardSize) {
+    return { row: Math.floor(position / boardSize), col: position % boardSize };
+  }
+  function getDownSequence({ row, col }, lines) {
+    const sequence = [];
+
+    for (let index = row + 1; index < lines.length; index++) {
+      sequence.push(lines[++row][col]);
+    }
+
+    return sequence;
+  }
+
+  const adjacentLine = getDownSequence(
+    getRowAndCol(emptyPosition, line.length),
+    boardRows
+  );
+
+  return adjacentLine.join("");
+}
+
+function isLegalMoveFor(player, position, currentLine) {
+  const adjacentLineGetters = [getRigth, getLeft, getDown];
+  const squareIsEmpty = currentLine[position] === ".";
+
+  if (squareIsEmpty) {
+    for (const getAdjacentLine of adjacentLineGetters) {
+      if (checkPosition(player, getAdjacentLine(currentLine, position))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+function getOutputLine(player, line) {
+  let output = "";
+  for (let position = 0; position < line.length; position++) {
+    if (isLegalMoveFor(player, position, line)) {
+      output += "0";
+    } else {
+      output += line[position];
+    }
+  }
+  output += "\n";
+  return output;
+}
+
+function getGameState(input) {
+  const linesAndTurn = input.split("\n");
+  return [linesAndTurn.pop(), linesAndTurn];
+}
+
+module.exports = createReversi;
