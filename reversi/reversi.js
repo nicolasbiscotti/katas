@@ -20,7 +20,7 @@ function createReversi() {
 function canAnyCounterBeFlipped(spot, spotValue, player) {
   let theAnswerIs;
 
-  if (spot === 1 && (spotValue === "." || spotValue === player)) {
+  if (spot === 0 && (spotValue === "." || spotValue === player)) {
     theAnswerIs = false;
   } else if (spotValue === ".") {
     theAnswerIs = false;
@@ -33,10 +33,9 @@ function canAnyCounterBeFlipped(spot, spotValue, player) {
   return theAnswerIs;
 }
 
-function checkPosition(player, adjacentLine) {
+function isFlippingLine(player, adjacentLine) {
   for (let spot = 0; spot < adjacentLine.length; spot++) {
-    const spotValue = adjacentLine[spot];
-    const answer = canAnyCounterBeFlipped(spot + 1, spotValue, player);
+    const answer = canAnyCounterBeFlipped(spot, adjacentLine[spot], player);
     if (answer !== null) {
       return answer;
     }
@@ -87,7 +86,7 @@ function isLegalMoveFor(player, position, currentLine) {
 
   if (squareIsEmpty) {
     for (const getAdjacentLine of adjacentLineGetters) {
-      if (checkPosition(player, getAdjacentLine(currentLine, position))) {
+      if (isFlippingLine(player, getAdjacentLine(currentLine, position))) {
         return true;
       }
     }
